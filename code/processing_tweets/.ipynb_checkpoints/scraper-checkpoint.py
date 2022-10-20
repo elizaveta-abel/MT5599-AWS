@@ -2,10 +2,12 @@
 import json
 import snscrape.modules.twitter as sntwitter
 from _datetime import datetime, timedelta
-from multiprocessing import Pool
+from multiprocessing import Pool # multithreading
 import tqdm # for progress bar
 import pandas as pd
-import itertools
+import itertools 
+import numpy as np # to split handles
+import time # to slow down scraper
 
 scraper = sntwitter.TwitterSearchScraper
 
@@ -62,7 +64,95 @@ def get_tweetlist(handle: str):
     print(f"{handle} completed!")
     return tweetlist
 
+
+
+# function to automatically detect number of handles and run scraper
+def scraper(handles_location,
+            handles_place,
+            year,
+           preferred_handles = 300):
+    
+    print("starting place")
+    
+    batch_number_place = round(len(handles_place)/preferred_handles)
+    handles_place_arr = np.array_split(handles_place, batch_number_place)
+    
+    print("number of batches: ", batch_number_place)
+    
+    no_tweets_place = 0
+    for i in range(batch_number_place):
+        handles = handles_place_arr[i]
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_place += len(results)
+        output_path = "../data/tweets_place_" + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        
+        
+    print("number of tweets gathered from place: ", no_tweets_place)
+        
+        
+    '''
+    
+
+    print("starting location")
+        
+    batch_number_location = round(len(handles_location)/preferred_handles)
+    handles_location_arr = np.array_split(handles_location, batch_number_location)
+    
+    print("number of batches: ", batch_number_location)
+        
+    no_tweets_location = 0
+    for i in range(batch_number_location):
+        handles = handles_location_arr[i]
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_location += len(results)
+        output_path = "../data/tweets_location_"  + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        
+    print("number of tweets gathered from location: ", no_tweets_location)
+    
+    print("total tweets gathered: ", no_tweets_place + no_tweets_location)
+    '''
+        
+    return "done!"
+
+
 if __name__ == "__main__":
+    
+    # 2016
+    handles_location_2016 = "../data/argentina_residents_by_user_location_2016.txt"
+    with open(handles_path_2016) as f:
+        handles_location_2016 = f.read().splitlines()
+        
+    handles_place_2016 = "../data/simpler_argentina_residents_by_place_2016.txt"
+    with open(handles_path_2016) as f:
+        handles_place_2016 = f.read().splitlines()
+        
+    
+    scraper(handles_location_2016, handles_place_2016, "2016")
+    
+    
+    # 2019
+    handles_location_2019 = "../data/argentina_residents_by_user_location_2019.txt"
+    with open(handles_path_2019) as f:
+        handles_location_2019 = f.read().splitlines()
+        
+    handles_place_2019 = "../data/simpler_argentina_residents_by_place_2019.txt"
+    with open(handles_path_2019) as f:
+        handles_place_2019 = f.read().splitlines()
+        
+    
+    scraper(handles_location_2019, handles_place_2019, "2019")
 
     '''
     ######## 2016, user_location
@@ -81,39 +171,46 @@ if __name__ == "__main__":
     print("")
     print("2016 location done")
     print("")
-    '''
+    
     
     ######## 2016, place
     handles_path = "../data/argentina_residents_by_place_2016.txt"
     with open(handles_path) as f:
         handles = f.read().splitlines()
-    handles_1 = handles[0:386]
-    handles_2 = handles[386:772]
-    handles_3 = handles[772:1158]
 
     pool = Pool(processes=len(handles_1))
     results = []
-    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_1), total=len(handles)):
+    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_1), total=len(handles_1)):
         results.extend(result)
-    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_2), total=len(handles)):
-        results.extend(result)
-    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_3), total=len(handles)):
-        results.extend(result)
-
-    output_path = "../data/tweets_place_2016.json"
+    output_path = "../data/tweets_place_2016_1.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
-    print("")
-    print("2016 place done")
-    print("")
     
+    pool = Pool(processes=len(handles_2))
+    results = []
+    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_2), total=len(handles_2)):
+        results.extend(result)
+    output_path = "../data/tweets_place_2016_2.json"
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=4, ensure_ascii=False)
+        
+    pool = Pool(processes=len(handles_3))
+    results = []
+    for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles_3), total=len(handles_3)):
+        results.extend(result)
+    output_path = "../data/tweets_place_2016_3.json"   
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=4, ensure_ascii=False)
+   
+    print("")
+    print("2016 place 3 done")
+    print("")
     
     
     print("")
     print("2016 done")
     print("")
     
-'''
     
     ######## 2019, user_location
     handles_path = "../data/argentina_residents_by_user_location_2019.txt"
@@ -152,4 +249,6 @@ if __name__ == "__main__":
     print("")
     print("2019 done")
     print("")
-'''    
+    
+    '''
+   
