@@ -64,13 +64,10 @@ def get_tweetlist(handle: str):
     print(f"{handle} completed!")
     return tweetlist
 
-
+'''
 
 # function to automatically detect number of handles and run scraper
-def scraper(handles_location,
-            handles_place,
-            year,
-           preferred_handles = 300):
+def scraper(handles_place, year, preferred_handles):
     
     print("starting place")
     
@@ -78,6 +75,7 @@ def scraper(handles_location,
     handles_place_arr = np.array_split(handles_place, batch_number_place)
     
     print("number of batches: ", batch_number_place)
+    
     
     no_tweets_place = 0
     for i in range(batch_number_place):
@@ -91,12 +89,12 @@ def scraper(handles_location,
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=4, ensure_ascii=False)
         print(output_path, " done")
-        
+        time.sleep(300)
         
     print("number of tweets gathered from place: ", no_tweets_place)
         
         
-    '''
+
     
 
     print("starting location")
@@ -122,39 +120,157 @@ def scraper(handles_location,
     print("number of tweets gathered from location: ", no_tweets_location)
     
     print("total tweets gathered: ", no_tweets_place + no_tweets_location)
-    '''
+
         
     return "done!"
-
+'''
 
 if __name__ == "__main__":
     
+    
+    
     # 2016
     handles_location_2016 = "../data/argentina_residents_by_user_location_2016.txt"
-    with open(handles_path_2016) as f:
+    with open(handles_location_2016) as f:
         handles_location_2016 = f.read().splitlines()
         
     handles_place_2016 = "../data/simpler_argentina_residents_by_place_2016.txt"
-    with open(handles_path_2016) as f:
+    with open(handles_place_2016) as f:
         handles_place_2016 = f.read().splitlines()
         
     
-    scraper(handles_location_2016, handles_place_2016, "2016")
+    print("starting place")
+    
+    preferred_handles = 200
+    year = "2016"
+    
+    batch_number_place = round(len(handles_place_2016)/preferred_handles)
+    handles_place_arr = np.array_split(handles_place_2016, batch_number_place)
+    
+    print("number of batches: ", batch_number_place)
+    
+    
+    no_tweets_place = 0
+    for i in range(20, batch_number_place):
+        handles = handles_place_arr[i]
+        handles = np.delete(handles, np.where(handles == 'Polinesios_Cr'))
+        handles = np.delete(handles, np.where(handles == ''))
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_place += len(results)
+        output_path = "../data/tweets_place_" + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        time.sleep(300)
+        
+    print("number of tweets gathered from place: ", no_tweets_place)
+        
+        
+    '''
+    
+
+    print("starting location")
+        
+    batch_number_location = round(len(handles_location_2016)/preferred_handles)
+    handles_location_arr = np.array_split(handles_location_2016, batch_number_location)
+    
+    print("number of batches: ", batch_number_location)
+        
+    no_tweets_location = 0
+    for i in range(batch_number_location):
+        handles = handles_location_arr[i]
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_location += len(results)
+        output_path = "../data/tweets_location_"  + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        
+    print("number of tweets gathered from location: ", no_tweets_location)
+    
+    print("total tweets gathered: ", no_tweets_place + no_tweets_location)
+
+    
+    
+    
     
     
     # 2019
     handles_location_2019 = "../data/argentina_residents_by_user_location_2019.txt"
-    with open(handles_path_2019) as f:
+    with open(handles_location_2019) as f:
         handles_location_2019 = f.read().splitlines()
         
     handles_place_2019 = "../data/simpler_argentina_residents_by_place_2019.txt"
-    with open(handles_path_2019) as f:
+    with open(handles_place_2019) as f:
         handles_place_2019 = f.read().splitlines()
         
     
-    scraper(handles_location_2019, handles_place_2019, "2019")
+        
+    print("starting place")
+    
+    preferred_handles = 200
+    year = "2019"
+    
+    batch_number_place = round(len(handles_place_2019)/preferred_handles)
+    handles_place_arr = np.array_split(handles_place_2019, batch_number_place)
+    
+    print("number of batches: ", batch_number_place)
+    
+    
+    no_tweets_place = 0
+    for i in range(batch_number_place):
+        handles = handles_place_arr[i]
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_place += len(results)
+        output_path = "../data/tweets_place_" + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        time.sleep(300)
+        
+    print("number of tweets gathered from place: ", no_tweets_place)
+        
+        
 
-    '''
+    
+
+    print("starting location")
+        
+    batch_number_location = round(len(handles_location_2019)/preferred_handles)
+    handles_location_arr = np.array_split(handles_location_2019, batch_number_location)
+    
+    print("number of batches: ", batch_number_location)
+        
+    no_tweets_location = 0
+    for i in range(batch_number_location):
+        handles = handles_location_arr[i]
+        pool = Pool(processes=len(handles))
+        results = []
+        for result in tqdm.tqdm(pool.imap_unordered(get_tweetlist, handles), total=len(handles)):
+            results.extend(result)
+        no_tweets_location += len(results)
+        output_path = "../data/tweets_location_"  + year + "_" + str(i) + ".json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4, ensure_ascii=False)
+        print(output_path, " done")
+        
+    print("number of tweets gathered from location: ", no_tweets_location)
+    
+    print("total tweets gathered: ", no_tweets_place + no_tweets_location)
+
+    
+
+    
+    
     ######## 2016, user_location
     handles_path = "../data/argentina_residents_by_user_location_2016.txt"
     with open(handles_path) as f:

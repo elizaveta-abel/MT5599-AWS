@@ -6,6 +6,7 @@ import py3langid as langid
 import json
 import unicodedata
 import html
+import tqdm
 
 
 def process(s):
@@ -28,9 +29,9 @@ def process(s):
     return r
 
 def format_datetime(df):
-        df["DateTime"] = pd.to_datetime(df["DateTime"])
-        df["DateTime"] = pd.DatetimeIndex(df["DateTime"]).floor('S').tz_localize(None)
-        return df
+    df["DateTime"] = pd.to_datetime(df["DateTime"])
+    df["DateTime"] = pd.DatetimeIndex(df["DateTime"]).floor('S').tz_localize(None)
+    return df
 
 '''
 def filter(text,nlp, blacklist, keywords):
@@ -55,7 +56,7 @@ def get_processed_twitter_df(df):
     print("ready for processing")
     df = format_datetime(df)
     tweets = df["tweet_content"]
-    df["tweet"] = [process(x) for x in tweets]
+    df["tweet"] = [process(x) for x in tqdm.tqdm(tweets)]
     print("text formatted")
     #df = df[[filter(x, blacklist, keywords) for x in tweets]]
     # lang_filter = (lambda text: langid.classify(text)[0] == 'en')
@@ -71,8 +72,17 @@ def get_processed_twitter_df(df):
     return df
 
 if __name__ == "__main__":
-    df = pd.read_csv("../data/tweets_2016.csv")
     
-    df = get_processed_df(df)
+    paths = ["../data/df_2016.feather", "../data/df_2019.feather"]
     
-    df.to_json("../data/tweets_2016_cleaned.json", indent=4)
+    for path in paths:
+    
+        df = pd.read_feather(path)
+        
+        df = get_processed_twitter_df(df)
+
+        print("cleaned")
+        print(df.tweet)
+    
+        output_path = path + "_cleaned.feather"
+        df.to_feather(output_path)
