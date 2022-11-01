@@ -5,10 +5,10 @@ from geopy.extra.rate_limiter import RateLimiter
 from geopy import Nominatim
 from datetime import datetime
 
-from epitator.geoname_annotator import GeonameAnnotator
-from epitator.date_annotator import DateAnnotator
-from epitator.count_annotator import CountAnnotator
-from epitator.annotator import AnnoDoc
+#from epitator.geoname_annotator import GeonameAnnotator
+#from epitator.date_annotator import DateAnnotator
+#from epitator.count_annotator import CountAnnotator
+#from epitator.annotator import AnnoDoc
 
 import re
 import sys
@@ -61,7 +61,7 @@ def summarizer(text: str) -> str:
 # function that extracts location names/admin codes/lat/lng, case and death counts, and date ranges from the input string
 # uses epitator since it already trained rules for extracting medical/infectious disease data
 
-
+'''
 def epitator_extract(txt, max_ents=1):
     # input string and add annotators
     doc = AnnoDoc(txt)
@@ -136,11 +136,11 @@ def parse_dengue(row):
         'severe_cases',
         'deaths'
     ])
-
+'''
 
 if __name__ == '__main__':
     print('Opening df')
-    df = pd.read_feather('combined_df_anomaly.feather')
+    df = pd.read_feather('../data/combined_df.feather')
 
     print('Cleaning')
     df['content'] = df['content'].progress_apply(clean)
@@ -148,6 +148,7 @@ if __name__ == '__main__':
         '|'.join(('case', 'cases', 'death', 'deaths')))]
 
     dengue_df = df[df['disease'] == 'dengue']
+    '''
     df = df[df['disease'] != 'dengue']
 
     df['summary'] = df['content'].progress_apply(summarizer)
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     df = df.applymap(lambda y: pd.NA if isinstance(
         y, (list, str)) and len(y) == 0 else y)
     df = df.reset_index(drop=True)
-
+    '''
     print('Parsing dengue')
     dengue_df = pd.concat([parse_dengue(row)
                           for _, row in tqdm(dengue_df.iterrows())])
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     dengue_df = dengue_df.reset_index(drop=True)
 
     print('Finishing up')
-    full_df = pd.concat([df, dengue_df], axis=0, ignore_index=True)
+    full_df = dengue_df#pd.concat([df, dengue_df], axis=0, ignore_index=True)
     full_df.to_feather('dataset.feather')
     full_df = full_df.drop(['Unnamed: 0', 'index'], axis=1)
     full_df.to_feather('dataset.feather')
