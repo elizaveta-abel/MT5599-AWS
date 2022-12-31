@@ -1,5 +1,0 @@
-snscrape
-tqdm
-pandas
-#numpy
-
