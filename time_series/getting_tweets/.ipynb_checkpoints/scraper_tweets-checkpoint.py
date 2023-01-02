@@ -80,19 +80,11 @@ if __name__ == "__main__":
     year = "2016"
     
     no_tweets = 0
-    # 253 was skipped
-    # 566 was skipped
-    # 261 was skipped
-    # 264 was skipped
+
     skipped = []
-    for i in range(490, 395, -1):
-    #for i in range(546, 504, -1):
-    #for i in range(548, 560):
-    #for i in range(562, 564):
-    #for i in range(566, 567):
-    #for i in range(354, 365):
-    #for i in range(266, 300):
-    #for i in range(253, 254):
+
+    for i in range(batch_number):
+    
         try:
             print("starting batch number", i)
             handles_temp = handles_arr[i]

@@ -48,32 +48,19 @@ def filter(text,nlp, blacklist, keywords):
 '''
 
 def get_processed_twitter_df(df):
-    #with open("../data//keywords_lemmatised.json", "r", encoding="utf-8") as f:
-    #    keywords = json.load(f)
-    #with open("./data/input_data/blacklist.txt", "r", encoding="utf-8") as f:
-    #    blacklist = f.readlines()
-    #keys = list(keywords.keys())
+
     print("ready for processing")
     df = format_datetime(df)
     tweets = df["tweet_content"]
     df["tweet"] = [process(x) for x in tqdm.tqdm(tweets)]
     print("text formatted")
-    #df = df[[filter(x, blacklist, keywords) for x in tweets]]
-    # lang_filter = (lambda text: langid.classify(text)[0] == 'en')
-    #  df = df[[lang_filter(x) for x in tweets]]
-    #  print("language filtered")
-    #  df = df[[(len(x) >= 50) for x in tweets]]
-    #print("starting keyword filter")
-    #   df = df[[filter(s) for s in df["tweet"]]]
-    #print("filtering complete")
-   # df = df.reset_index()
-    #df.to_json("../data/tweets_2016_cleaned.json", indent=4)
+
     print("twitter processing finished")
     return df
 
 if __name__ == "__main__":
     
-    paths = ["../../data/df_2016_cleaned.feather"]
+    paths = ["../data/df_2016.feather", "../data/df_2019.feather"]
     
     for path in paths:
     
@@ -82,6 +69,7 @@ if __name__ == "__main__":
         df = get_processed_twitter_df(df)
 
         print("cleaned")
+        print(df.tweet)
     
         output_path = path + "_cleaned.feather"
         df.to_feather(output_path)

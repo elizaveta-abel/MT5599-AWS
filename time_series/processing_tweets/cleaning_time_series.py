@@ -160,7 +160,7 @@ def clean_df(filepath):
 if __name__ == "__main__":
     
     filepaths = []
-    for i in range(0, 567):
+    for i in range(266, 401):
         filepath = "../../data/spanish_tweets_2016_" + str(i) + ".json"
         filepaths.append(filepath)
 
