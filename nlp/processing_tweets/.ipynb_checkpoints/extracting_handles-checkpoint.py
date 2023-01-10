@@ -1,63 +1,7 @@
 import pandas as pd
 import json
 
-paths_2016 = ["../../data/2015-10-01-to-2015-11-01.csv",
-        "../../data/2015-11-01-to-2015-12-01.csv",
-        "../../data/2015-12-01-to-2016-01-01.csv",
-        "../../data/2016-01-01-to-2016-02-01.csv",
-        "../../data/2016-02-01-to-2016-03-01.csv",
-        "../../data/2016-03-01-to-2016-04-01.csv",
-        "../../data/2016-04-01-to-2016-05-01.csv",
-        "../../data/2016-05-01-to-2016-06-01.csv",
-        "../../data/2016-06-01-to-2016-07-01.csv",
-        "../../data/2016-07-01-to-2016-08-01.csv",
-        "../../data/2016-08-01-to-2016-09-01.csv",
-        "../../data/2016-09-01-to-2016-10-01.csv",
-        "../../data/2016-10-01-to-2016-11-01.csv"]
 
-paths_2019 = ["../../data/2019-06-01-to-2019-07-01.csv",
-             "../../data/2019-07-01-to-2019-08-01.csv",
-             "../../data/2019-08-01-to-2019-09-01.csv",
-             "../../data/2019-09-01-to-2019-10-01.csv",
-             "../../data/2019-10-01-to-2019-11-01.csv",
-             "../../data/2019-11-01-to-2019-12-01.csv",
-             "../../data/2019-12-01-to-2020-01-01.csv",
-             "../../data/2020-01-01-to-2020-02-01.csv",
-             "../../data/2020-02-01-to-2020-03-01.csv",
-             "../../data/2020-03-01-to-2020-04-01.csv",
-             "../../data/2020-04-01-to-2020-05-01.csv",
-             "../../data/2020-05-01-to-2020-06-01.csv",
-             "../../data/2020-06-01-to-2020-07-01.csv"]
-
-df0_2016 = pd.read_csv(paths_2016[0], on_bad_lines='skip', low_memory=False)
-df1_2016 = pd.read_csv(paths_2016[1], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df2_2016 = pd.read_csv(paths_2016[2], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df3_2016 = pd.read_csv(paths_2016[3], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df4_2016 = pd.read_csv(paths_2016[4], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df5_2016 = pd.read_csv(paths_2016[5], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df6_2016 = pd.read_csv(paths_2016[6], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df7_2016 = pd.read_csv(paths_2016[7], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df8_2016 = pd.read_csv(paths_2016[8], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df9_2016 = pd.read_csv(paths_2016[9], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df10_2016 = pd.read_csv(paths_2016[10], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df11_2016 = pd.read_csv(paths_2016[11], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df12_2016 = pd.read_csv(paths_2016[12], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-
-df0_2019 = pd.read_csv(paths_2019[0], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df1_2019 = pd.read_csv(paths_2019[1], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df2_2019 = pd.read_csv(paths_2019[2], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df3_2019 = pd.read_csv(paths_2019[3], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df4_2019 = pd.read_csv(paths_2019[4], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df5_2019 = pd.read_csv(paths_2019[5], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df6_2019 = pd.read_csv(paths_2019[6], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df7_2019 = pd.read_csv(paths_2019[7], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df8_2019 = pd.read_csv(paths_2019[8], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df9_2019 = pd.read_csv(paths_2019[9], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df10_2019 = pd.read_csv(paths_2019[10], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df11_2019 = pd.read_csv(paths_2019[11], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-df12_2019 = pd.read_csv(paths_2019[12], on_bad_lines='skip', low_memory=False, lineterminator='\n')
-
-print("finished loading dfs")
 
 
 
@@ -179,79 +123,57 @@ def extract_user(df):
 
     return df_coord
 
-df0_2016 = extract_user(df0_2016)
-print("df0_2016 done")
-df1_2016 = extract_user(df1_2016)
-print("df1_2016 done")
-df2_2016 = extract_user(df2_2016)
-print("df2_2016 done")
-df3_2016 = extract_user(df3_2016)
-print("df3_2016 done")
-df4_2016 = extract_user(df4_2016)
-print("df4_2016 done")
-df5_2016 = extract_user(df5_2016)
-print("df5_2016 done")
-df6_2016 = extract_user(df6_2016)
-print("df6_2016 done")
-df7_2016 = extract_user(df7_2016)
-print("df7_2016 done")
-df8_2016 = extract_user(df8_2016)
-print("df8_2016 done")
-df9_2016 = extract_user(df9_2016)
-print("df9_2016 done")
-df10_2016 = extract_user(df10_2016)
-print("df10_2016 done")
-df11_2016 = extract_user(df11_2016)
-print("df11_2016 done")
-df12_2016 = extract_user(df12_2016)
-print("df12_2016 done")
 
-dfs_2016 = [df0_2016, df1_2016, df2_2016, df3_2016, df4_2016, df5_2016, df6_2016, df7_2016, df8_2016, df9_2016, df10_2016, df11_2016, df12_2016]
-df_2016 = pd.concat(dfs_2016, ignore_index=True)
 
-df_2016.drop(labels=["Unnamed: 0"], axis=1, inplace=True)
-#df_2016.drop_duplicates(inplace=True)
-df_2016.reset_index(drop=True, inplace=True)
-df_2016.to_csv("../../data/df_2016.csv")
+if __name__ == "__main__":
 
-print("")
-print("2016 done")
-print("")
+    years = ["2016", "2019"]
 
-df0_2019 = extract_user(df0_2019)
-print("df0_2019 done")
-df1_2019 = extract_user(df1_2019)
-print("df1_2019 done")
-df2_2019 = extract_user(df2_2019)
-print("df2_2019 done")
-df3_2019 = extract_user(df3_2019)
-print("df3_2019 done")
-df4_2019 = extract_user(df4_2019)
-print("df4_2019 done")
-df5_2019 = extract_user(df5_2019)
-print("df5_2019 done")
-df6_2019 = extract_user(df6_2019)
-print("df6_2019 done")
-df7_2019 = extract_user(df7_2019)
-print("df7_2019 done")
-df8_2019 = extract_user(df8_2019)
-print("df8_2019 done")
-df9_2019 = extract_user(df9_2019)
-print("df9_2019 done")
-df10_2019 = extract_user(df10_2019)
-print("df10_2019 done")
-df11_2019 = extract_user(df11_2019)
-print("df11_2019 done")
-df12_2019 = extract_user(df12_2019)
-print("df12_2019 done")
 
-dfs_2019 = [df0_2019, df1_2019, df2_2019, df3_2019, df4_2019, df5_2019, df6_2019, df7_2019, df8_2019, df9_2019, df10_2019, df11_2019, df12_2019]
-df_2019 = pd.concat(dfs_2019, ignore_index=True)
+    for year in years:
 
-df_2019.drop(labels=["Unnamed: 0"], axis=1, inplace=True)
-#df_2016.drop_duplicates(inplace=True)
-df_2019.reset_index(drop=True, inplace=True)
-df_2019.to_csv("../../data/df_2019.csv")
+        if year == "2016":
+            dates = pd.date_range(start='2015-10-01',
+                                   end='2016-10-01', freq='MS') # by month start
+        else:
+            dates = pd.date_range(start='2019-06-01',
+                                   end='2020-07-01', freq='MS')
 
-print("")
-print("2019 done")
+
+        dates_arr = []
+        for i in range(len(dates)-1):
+            dates_arr.append(dates[i:i+2]) 
+
+
+        dfs = []
+
+
+
+
+
+        for date in dates_arr:
+            start_date = str(date[0])
+            end_date = str(date[1])
+
+            path = "../../data/" + start_date + "-to-" + end_date + ".csv"  
+
+            df = pd.read_csv(paths_2016[1],
+                             on_bad_lines='skip',
+                             low_memory=False,
+                             lineterminator='\n')
+
+            df = extract_user(df)
+
+
+            dfs.append(df)
+
+
+
+        df_main = pd.concat(dfs, ignore_index=True)
+
+        df_main.drop(labels=["Unnamed: 0"], axis=1, inplace=True)
+        #df_2016.drop_duplicates(inplace=True)
+        df_main.reset_index(drop=True, inplace=True)
+        df_main.to_csv("../../data/df_" + year + ".csv")
+
+

@@ -71,5 +71,5 @@ if __name__ == "__main__":
         print("cleaned")
         print(df.tweet)
     
-        output_path = path + "_cleaned.feather"
+        output_path = path.replace(".feather", "_cleaned.feather")
         df.to_feather(output_path)

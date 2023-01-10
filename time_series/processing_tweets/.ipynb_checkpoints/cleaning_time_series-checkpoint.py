@@ -6,8 +6,42 @@ from multiprocessing import Pool # multithreading
 import tqdm
 from time import process_time
 import feather
-  
+import boto3
 
+"""
+Demo script for reading a CSV file from S3 into a pandas data frame using the boto3 library
+"""
+
+import os
+
+import boto3
+import pandas as pd
+
+
+#AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
+
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    aws_session_token=AWS_SESSION_TOKEN,
+)
+
+response = s3_client.get_object(Bucket="mt5599", Key="tweets/spanish_tweets_2016_0.json")
+
+status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+if status == 200:
+    print(f"Successful S3 get_object response. Status - {status}")
+    books_df = pd.read_json(response.get("Body"))
+    print(books_df)
+else:
+    print(f"Unsuccessful S3 get_object response. Status - {status}")
+  
+'''
 
 # write function to remove unnecessary columns
 def keep_columns(df, # dataframe to be cleaned
@@ -132,12 +166,14 @@ def clean_df(filepath):
     # removing unnecessary columns
     print("removing unnecessary columns")
     print()
-    df = keep_columns(df, ["id", "DateTime", "coordinates", "place", "username", "user_location"])
+    df = keep_columns(df, ["id", "DateTime", "coordinates",
+                           "place", "username", "user_id", 
+                           "user_location", "tweet_content"])
 
     # filtering out tweets that have no location data
-    print("filtering out tweets that have no location data")
-    print()
-    df = has_loc(df)
+    #print("filtering out tweets that have no location data")
+    #print()
+    #df = has_loc(df)
 
     # extracting components of place
     print("extracting components of place")
@@ -183,4 +219,4 @@ if __name__ == "__main__":
     
     
     
-    
+'''

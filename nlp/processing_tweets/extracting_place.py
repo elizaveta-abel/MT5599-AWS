@@ -27,7 +27,7 @@ def extract_place(df):
 
         if df_coord.place[i] != "None":
             try:
-                split_by = "Place\(fullName='|', name='|', type='|', country='|', countryCode='|'\)"
+                split_by = "Place\(fullName='|', name='|',type='|', country='|', countryCode='|'\)"
                 temp = re.split(split_by, df_coord.place[i])
 
                 df_coord['place_full_name'][i] = temp[1]
@@ -75,20 +75,18 @@ def extract_coordinates(df):
     return df_coord
 
 
-df_2016 = pd.read_feather("../data/df_2016.feather_cleaned.feather")
-print("finished loading df 2016")
-df_2016 = extract_place(df_2016)
-print("2016 place extracted")
-df_2016 = extract_coordinates(df_2016)
-print("2016 coordinates extracted")
-df_2016.to_feather("../data/df_2016_cleaned_with_place.feather")
-print("2016 done")
-
-df_2019 = pd.read_feather("../data/df_2019.feather_cleaned.feather")
-print("finished loading df 2019")
-df_2019 = extract_place(df_2019)
-print("2019 place extracted")
-df_2019 = extract_coordinates(df_2019)
-print("2019 coordinates extracted")
-df_2019.to_feather("../data/df_2019#_cleaned_with_place.feather")
-print("2019 done")
+if __name__ == "__main__":
+    
+    years = ["2016", "2019"]
+    
+    for year in years:
+        
+        df = pd.read_feather("../../data/df_" + year + "_cleaned.feather")
+        print("finished loading df ", year)
+        df = extract_place(df)
+        print(year, " place extracted")
+        df = extract_coordinates(df)
+        print(year, " coordinates extracted")
+        df.to_feather("../../data/df_" + year + "_cleaned_with_place.feather")
+        print(year, " done")
+        
