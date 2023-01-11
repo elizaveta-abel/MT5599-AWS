@@ -1,203 +1,69 @@
 import pandas as pd
 import json
 import re
-import tqdm
-from multiprocessing import Pool # multithreading
-import tqdm
-from time import process_time
+#import tqdm
+#from multiprocessing import Pool # multithreading
+#import tqdm
+#from time import process_time
 import feather
-import boto3
-
-"""
-Demo script for reading a CSV file from S3 into a pandas data frame using the boto3 library
-"""
-
+import io
 import os
 
 import boto3
-import pandas as pd
 
 
-#AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
+"""
+Functions to process data
+"""
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    aws_session_token=AWS_SESSION_TOKEN,
-)
-
-response = s3_client.get_object(Bucket="mt5599", Key="tweets/spanish_tweets_2016_0.json")
-
-status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
-
-if status == 200:
-    print(f"Successful S3 get_object response. Status - {status}")
-    books_df = pd.read_json(response.get("Body"))
-    print(books_df)
-else:
-    print(f"Unsuccessful S3 get_object response. Status - {status}")
-  
-'''
-
-# write function to remove unnecessary columns
-def keep_columns(df, # dataframe to be cleaned
-                 columns): # list of columns to keep
-    df = df[columns]
-    return df
-
-#write function to keep only tweets with location data
-def has_loc(df):
-    df = df[df.coordinates != "None"]
-    df = df[df.place != "None"]
-    df = df.reset_index(drop=True)
-    return df
-
-
-# helper function to extract place and coordinates
-def safe_json_loads(string):
-    try:
-        string = json.loads(string)
-    except:
-        string = None
-    return(string)
-
-
-
-def extract_place_helper(row):
-    if row[1]["place"] != "None":
-        try:
-            split_by = "Place\(fullName='|', name='|', type='|', country='|', countryCode='|'\)"
-            temp = re.split(split_by, row[1]["place"])
-
-            row[1]['place_full_name'] = temp[1]
-            row[1]['place_name'] = temp[2]
-            row[1]['place_type'] = temp[3]
-            row[1]['place_country'] = temp[4]
-            row[1]['place_country_code'] = temp[5]
-        except:
-            row[1]['place_full_name'] = None
-            row[1]['place_name'] = None
-            row[1]['place_type'] = None
-            row[1]['place_country'] = None
-            row[1]['place_country_code'] = None
-            
-    return row[1]
-
-
-# extracting place components
-def extract_place(df):
-    
-    df_coord = df
-    
-    df_coord['place_full_name'] = "None"
-    df_coord['place_name'] = "None"
-    df_coord['place_type'] = "None"
-    df_coord['place_country'] = "None"
-    df_coord['place_country_code'] = "None"
 
     
-    pool = Pool(processes=round(len(df_coord.index)/1000))
 
-    result_arr = []
+# instead of 
+# df = pd.read_json(filepath)
     
-    for result in tqdm.tqdm(pool.imap_unordered(extract_place_helper, df_coord.iterrows()),
-                            total=len(df_coord.index)):
-        result_arr.append(result)
-                
-    df_coord = pd.concat(result_arr, axis=1).transpose().sort_index()
-                
-    return df_coord
+# replace it with
+response = s3_client.get_object(Bucket="mt5599", Key=filepath)
+df = pd.read_json(response.get("Body"))
 
+# instead of
+#new_filepath = filepath.replace(".json", "_processed.feather")
+#df.to_feather(new_filepath)
 
+# replace it with
+new_filepath = filepath.replace(".json", "_processed.feather")
+with io.BytesIO() as feather_buffer:
+    df.to_feather(feather_buffer)
 
+    response = s3_client.put_object(
+        Bucket="mt5599", Key = new_filepath, Body=feather_buffer.getvalue()
+    )
 
-
-
-def extract_coordinates_helper(row):
-    if row[1]["coordinates"] != "None":
-        try:
-            split_by = "Coordinates\(longitude=|, latitude=|\)"
-            temp = re.split(split_by, row[1]["coordinates"])
-
-            row[1]['coordinates_longitude'] = temp[1]
-            row[1]['coordinates_latitude'] = temp[2]
-
-        except:
-            row[1]['coordinates_longitude'] = None
-            row[1]['coordinates_latitude'] = None
-
-    return row[1]
-
-
-# extracting place components
-def extract_coordinates(df):
-    
-    df_coord = df
-    
-    df_coord['coordinates_longitude'] = "None"
-    df_coord['coordinates_latitude'] = "None"
     
     
-    pool = Pool(processes=round(len(df_coord.index)/1000))
-
-    result_arr = []
     
-    for result in tqdm.tqdm(pool.imap_unordered(extract_coordinates_helper, df_coord.iterrows()),
-                            total=len(df_coord.index)):
-        result_arr.append(result)
-                
-    df_coord = pd.concat(result_arr, axis=1).transpose().sort_index()
-                
-    return df_coord
-
-
-
-def clean_df(filepath):
-    
-    # reading in data
-    print("reading in ", filepath)
-    print()
-    df = pd.read_json(filepath)
-
-    # removing unnecessary columns
-    print("removing unnecessary columns")
-    print()
-    df = keep_columns(df, ["id", "DateTime", "coordinates",
-                           "place", "username", "user_id", 
-                           "user_location", "tweet_content"])
-
-    # filtering out tweets that have no location data
-    #print("filtering out tweets that have no location data")
-    #print()
-    #df = has_loc(df)
-
-    # extracting components of place
-    print("extracting components of place")
-    df = extract_place(df)
-    print()
-
-    # extracting components of coordinates
-    print("extracting components of coordinates")
-    df = extract_coordinates(df)
-    print()
-    
-    new_filepath = filepath.replace(".json", "_processed.feather")
-    df.to_feather(new_filepath)
-
-    return df.shape[0]
-
-
-
 
 if __name__ == "__main__":
     
+    
+    # For getting and saving datasets directly from/to S3
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
+
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        aws_session_token=AWS_SESSION_TOKEN,
+    )
+    
+    
+    
+    
     filepaths = []
     for i in range(266, 401):
-        filepath = "../../data/spanish_tweets_2016_" + str(i) + ".json"
+        filepath = "s3://mt5599/tweets/spanish_tweets_2016_" + str(i) + ".json"
         filepaths.append(filepath)
 
     no_tweets = 0
@@ -216,7 +82,3 @@ if __name__ == "__main__":
             
     print("the number of geotagged tweets collected: ", no_tweets)
     print("the files that do not exist: ", non_existent_files)
-    
-    
-    
-'''
