@@ -4,6 +4,7 @@ import pandas as pd
 
 # Part 2: Get the NER, Location Text and Coordinates
 
+
 # Get the length of the dataframe
 lensptw = len(df["text"])
 
@@ -34,7 +35,7 @@ gpedf_sp = finalent_spacy_sp[finalent_spacy_sp['label'] == "LOC"]
 sptlocations = pd.merge(df, gpedf_sp, on = "TweetNumber", how = "left")
 
 
-
+'''
 ##########################################################################
 
 # Make the empty dataframes for lat and long
@@ -72,3 +73,4 @@ framesloc_sp = [splat, splong]
 finalloc_sp = pd.concat(framesloc_sp, axis = 1)
 
 
+'''

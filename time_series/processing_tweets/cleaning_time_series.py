@@ -263,7 +263,6 @@ def ner(df):
 PUTTING TOGETHER ALL ABOVE FUNCTIONS
 """
 
-import boto3
 
 def clean_df(filepath):
 #def clean_df(df):
