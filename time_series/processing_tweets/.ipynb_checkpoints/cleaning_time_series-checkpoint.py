@@ -157,7 +157,7 @@ def clean_tweet_helper(row):
     r = html.unescape(r)
     #r = r.encode("ascii", "ignore").decode()
     r = r.replace('\n', " ")
-    r = r.replace('@', " ")
+    #r = r.replace('@', " ")
     r = r.replace("#", " ")
     r = re.sub('http://\S+|https://\S+', '', r)
     #r = r.lower()
@@ -169,6 +169,9 @@ def clean_tweet_helper(row):
                                "]+", flags=re.UNICODE)
     r = (emoji_pattern.sub(r'', r))  # no emoji
     r = re.sub('\s{2,}', ' ', r)
+    
+    # new
+    r = re.sub(r'(\s)?@\w+', '', r)
     
     row[1]["tweet_clean"] = r
     
