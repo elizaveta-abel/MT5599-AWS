@@ -26,7 +26,7 @@ tokenizer = AutoTokenizer.from_pretrained("Davlan/bert-base-multilingual-cased-n
 
 model = AutoModelForTokenClassification.from_pretrained("Davlan/bert-base-multilingual-cased-ner-hrl")
 
-nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=0)
+nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=0, aggregation_strategy="simple") #group_sub_entities
 
 pd.set_option('display.max_rows', None)
 
@@ -91,7 +91,7 @@ def clean_tweet(df):
     
     df['tweet_clean'] = None
     
-    pool = Pool(processes=round(len(df.index)/100))
+    pool = Pool(processes=round(len(df.index)/10000))
 
     result_arr = []
     
@@ -120,17 +120,23 @@ def ner_helper(df_temp):
     ner_results = nlp(tweets_clean)
     
     spttext = pd.DataFrame([])
+    spttype = pd.DataFrame([])
     spttweet = pd.DataFrame([])
     
     for k, ner_result in tqdm.tqdm(enumerate(ner_results)):
         
         for i, result in enumerate(ner_result):
             
+            
+            spttext = pd.concat([spttext, pd.DataFrame({"ner_word": result['word']}, index = [0])], ignore_index = True)
+            spttype = pd.concat([spttype, pd.DataFrame({"ner_type": result['entity_group']}, index = [0])], ignore_index = True)
+            spttweet = pd.concat([spttweet, pd.DataFrame({'TweetNumber': k}, index = [0])], ignore_index = True)
+            '''
             combined_entity = None
 
             length = len(ner_result)
 
-            if result['entity'] == 'B-LOC':
+            if result['entity_group'] == 'LOC':
 
                 combined_entity = result['word']
 
@@ -149,12 +155,11 @@ def ner_helper(df_temp):
 
                         if j >= length:
                             break
+            '''
 
-                spttext = pd.concat([spttext, pd.DataFrame({"ner_loc": combined_entity}, index = [0])], ignore_index = True)
-                spttweet = pd.concat([spttweet, pd.DataFrame({'TweetNumber': k}, index = [0])], ignore_index = True)
 
     # Third: Combining the Spacy Spanish Findings
-    frames_spacy_sp = [spttweet, spttext]
+    frames_spacy_sp = [spttweet, spttype, spttext]
     finalent_spacy_sp = pd.concat(frames_spacy_sp, axis = 1)
     
     #print(finalent_spacy_sp)
@@ -171,8 +176,7 @@ def ner_helper(df_temp):
 
 def extract_ner_locations(df):
     
-    locations = df.ner_loc.unique().tolist()
-    
+    locations = df[df["ner_type"] == "LOC"].ner_word.value_counts().rename_axis('unique_values').reset_index(name='counts')
                             
     return locations
                             
@@ -190,27 +194,31 @@ def clean_df(filepath):
     response = s3_client.get_object(Bucket="mt5599", Key=filepath)
     df = pd.read_feather(io.BytesIO(response['Body'].read()))
     
-    
-    df = df[0:10000]
+    # REMOVE FOR FINAL
+    #df = df[0:10000]
     
     print("cleaning tweets")
     df = clean_tweet(df)
     
-    print("splitting df")
-    preferred_tweets = 1000
+    #print("splitting df")
+    #preferred_tweets = 20000
     
-    batch_number = round(df.shape[0]/preferred_tweets)
-    tweetid_arr = np.array_split(df, batch_number)
+    #batch_number = round(df.shape[0]/preferred_tweets)
+    #tweetid_arr = np.array_split(df, batch_number)
     
-    print("number of batches: ", len(tweetid_arr))
+   # print("number of batches: ", len(tweetid_arr))
                             
     print("starting ner")
     print()
+    '''
     new_df = pd.DataFrame()
     for i, temp_df in enumerate(tweetid_arr): 
         print("starting batch ", i)
         new_df = pd.concat([new_df, ner_helper(temp_df)])
-        
+     ''' 
+    
+    new_df = ner_helper(df)
+    
     #print("adding all dfs together")
     #df = pd.concat(ner_dfs, axis=0)
     #print("df.shape: ", df.shape)
@@ -237,17 +245,18 @@ def clean_df(filepath):
     #print("locations from ")
     #print(locations)
     locations_filepath = filepath.replace("tweets/spanish_tweets_2016_", "../../data/unique_locations_")
-    locations_filepath = locations_filepath.replace("_processed_wcontent.feather", ".txt")
+    locations_filepath = locations_filepath.replace(".feather", ".csv")
     #locations.to_csv(locations_filepath)   
     
-    
+    locations.to_csv(locations_filepath)
+    '''
     with open(locations_filepath, "w") as f:
         for location in locations:
             f.write(f"{location}\n")
-    
+    '''
                     
 #    return df
-    return len(locations)
+    return len(locations.index)
     
 
     
@@ -273,28 +282,28 @@ if __name__ == "__main__":
     
     
     
-    
     filepaths = []
-    for i in range(0, 1):
-        filepath = "tweets/spanish_tweets_2016_processed_wcontent_cleaned_" + str(i) + ".feather"
-        # filepath = "tweets/spanish_tweets_2016_processed_wcontent_cleaned_" + str(i) + ".feather"
+    # for i in range(0, 4)
+    # skipped: 92
+    for i in range(251, 568):
+        #filepath = "tweets/spanish_tweets_2016_processed_wcontent_cleaned_" + str(i) + ".feather"
+        filepath = "tweets/spanish_tweets_2016_" + str(i) + "_processed_wcontent.feather"
         filepaths.append(filepath)
 
     no_locations = 0
     non_existent_files = []
     for filepath in filepaths:
-        #try:
-        t1_start = process_time()
-        no_locations = clean_df(filepath)
-        #no_tweets = no_tweets + clean_df(filepath)
-        t1_stop = process_time()
-        print()
-        print("elapsed time: ", t1_stop - t1_start)
-        print()
-        #except:
-        #    non_existent_files.append(filepath)
-        #    continue
+        try:
+            t1_start = process_time()
+            no_locations = clean_df(filepath)
+            #no_tweets = no_tweets + clean_df(filepath)
+            t1_stop = process_time()
+            print()
+            print("elapsed time: ", t1_stop - t1_start)
+            print()
+        except:
+            non_existent_files.append(filepath)
+            continue
             
     print("the number of unique locations: ", no_locations)
     print("the files that do not exist: ", non_existent_files)
-
