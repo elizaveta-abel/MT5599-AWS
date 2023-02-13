@@ -285,7 +285,7 @@ if __name__ == "__main__":
     filepaths = []
     # for i in range(0, 4)
     # skipped: 92
-    for i in range(251, 568):
+    for i in range(441, 568):
         #filepath = "tweets/spanish_tweets_2016_processed_wcontent_cleaned_" + str(i) + ".feather"
         filepath = "tweets/spanish_tweets_2016_" + str(i) + "_processed_wcontent.feather"
         filepaths.append(filepath)
