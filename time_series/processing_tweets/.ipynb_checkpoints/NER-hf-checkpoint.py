@@ -26,7 +26,8 @@ tokenizer = AutoTokenizer.from_pretrained("Davlan/bert-base-multilingual-cased-n
 
 model = AutoModelForTokenClassification.from_pretrained("Davlan/bert-base-multilingual-cased-ner-hrl")
 
-nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=0, aggregation_strategy="simple") #group_sub_entities
+nlp = pipeline("ner", model=model, tokenizer=tokenizer, #device=0,
+               aggregation_strategy="simple") #group_sub_entities
 
 pd.set_option('display.max_rows', None)
 
@@ -267,7 +268,7 @@ def clean_df(filepath):
 
 if __name__ == "__main__":
     
-    
+   
     # For getting and saving datasets directly from/to S3
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -280,12 +281,134 @@ if __name__ == "__main__":
         aws_session_token=AWS_SESSION_TOKEN,
     )
     
-    
+    """
     
     filepaths = []
     # for i in range(0, 4)
     # skipped: 92
-    for i in range(441, 568):
+    #for i in range(530, 568):
+    
+    missed_paths = [253,
+                     266,
+                     267,
+                     268,
+                     269,
+                     270,
+                     271,
+                     272,
+                     273,
+                     274,
+                     275,
+                     276,
+                     277,
+                     278,
+                     279,
+                     280,
+                     281,
+                     282,
+                     283,
+                     284,
+                     285,
+                     286,
+                     287,
+                     288,
+                     289,
+                     290,
+                     291,
+                     292,
+                     293,
+                     294,
+                     295,
+                     296,
+                     297,
+                     298,
+                     299,
+                     300,
+                     314,
+                     354,
+                     355,
+                     356,
+                     357,
+                     358,
+                     359,
+                     360,
+                     361,
+                     362,
+                     363,
+                     364,
+                     365,
+                     396,
+                     397,
+                     398,
+                     399,
+                     400,
+                     401,
+                     402,
+                     403,
+                     404,
+                     405,
+                     406,
+                     407,
+                     408,
+                     409,
+                     410,
+                     411,
+                     412,
+                     413,
+                     414,
+                     415,
+                     416,
+                     417,
+                     418,
+                     419,
+                     420,
+                     431,
+                     432,
+                     433,
+                     434,
+                     435,
+                     436,
+                     497,
+                     498,
+                     499,
+                     504,
+                     509,
+                     510,
+                     511,
+                     512,
+                     513,
+                     514,
+                     529,
+                     530,
+                     531,
+                     532,
+                     533,
+                     534,
+                     535,
+                     536,
+                     537,
+                     538,
+                     543,
+                     544,
+                     545,
+                     548,
+                     549,
+                     550,
+                     551,
+                     552,
+                     553,
+                     554,
+                     555,
+                     556,
+                     557,
+                     558,
+                     559,
+                     562,
+                     563,
+                     564,
+                     566]
+    
+    for i in missed_paths:
         #filepath = "tweets/spanish_tweets_2016_processed_wcontent_cleaned_" + str(i) + ".feather"
         filepath = "tweets/spanish_tweets_2016_" + str(i) + "_processed_wcontent.feather"
         filepaths.append(filepath)
@@ -307,3 +430,27 @@ if __name__ == "__main__":
             
     print("the number of unique locations: ", no_locations)
     print("the files that do not exist: ", non_existent_files)
+
+
+    """
+    
+    text = ["Last night's party was a blast!",
+            "The decorations at last night's party were so flibberdoodleicious that I couldn't stop taking photos!",
+           "afsgghdshkjfdjkgfklkfjdh gahsghjdk ghs shgjkdh",
+           "I love eating sushi, especially salmon nigiri!",
+           "I saw her duck, it was so adorable!"]
+    
+    print("encoded text")
+    encoded_text = tokenizer(text)
+    print(encoded_text)
+    print()
+    print("tokens")
+    input_ids = encoded_text.input_ids
+    print(input_ids)
+    for ids in input_ids:
+        tokens = tokenizer.convert_ids_to_tokens(ids)
+        print(tokens)
+        #print(encoded_textx)
+    
+    print("vocab size")
+    print(tokenizer.vocab_size)
