@@ -1,6 +1,6 @@
 #import numpy as np
 # pip install pandas transformers torch torchvision torchaudio boto3 feather-format tqdm 
-
+# python Project/time_series/processing_tweets/NER-hf.py
 # Choose an instance with GPU cores (since working with HuggingFace model)
 
 import pandas as pd
@@ -434,11 +434,9 @@ if __name__ == "__main__":
 
     """
     
-    text = ["Last night's party was a blast!",
-            "The decorations at last night's party were so flibberdoodleicious that I couldn't stop taking photos!",
-           "afsgghdshkjfdjkgfklkfjdh gahsghjdk ghs shgjkdh",
-           "I love eating sushi, especially salmon nigiri!",
-           "I saw her duck, it was so adorable!"]
+    text = ["I saw her duck. It was so cute!",
+            "My name is Elizaveta. I'm from Aberdeen and I study at the University of St Andrews.",
+            "The decorations at last night's party were so flibberdoodleicious that I couldn't stop taking photos!"]
     
     print("encoded text")
     encoded_text = tokenizer(text)
@@ -447,10 +445,31 @@ if __name__ == "__main__":
     print("tokens")
     input_ids = encoded_text.input_ids
     print(input_ids)
-    for ids in input_ids:
+    print()
+    for i,ids in enumerate(input_ids):
         tokens = tokenizer.convert_ids_to_tokens(ids)
-        print(tokens)
+        
+        for j, token in enumerate(tokens):
+            print("& ", token," & ", ids[j], " \\\\ ")
+        print()
+        print()
+        #print(tokens)
         #print(encoded_textx)
-    
+    print()
     print("vocab size")
     print(tokenizer.vocab_size)
+    print()
+    print()
+    nlp_output = nlp(text)
+    
+    print("entity group & score & word & start & end \\\\")
+    for i, sentence in enumerate(nlp_output):
+        for j, entity in enumerate(sentence):
+            print(entity["entity_group"], " & ",
+                  entity["score"], " & ",
+                  entity["word"], " & ",
+                  entity["start"], " & ",
+                  entity["end"], " \\\\")
+            
+           # {'entity_group': 'PER', 'score': 0.9997233, 'word': 'Elizaveta', 'start': 11, 'end': 20}
+    
